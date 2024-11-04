@@ -22,6 +22,11 @@ export class CreateProductDto {
     @IsArray({message:'Las imagenes deben tenes el formaato array '})
     images:string[];  
 
+    @IsNotEmpty({message:'El stock no puede estar vacio!'})
+    @IsNumber({},{message:'El stock debe ser un numero'})
+    @Min(0,{message:'El stock no puede ser negativo'})
+    colorId: number;
+
 }
 
 

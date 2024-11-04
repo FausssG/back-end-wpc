@@ -1,4 +1,6 @@
 import {Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, Timestamp, UpdateColumn} from "typeorm";
+import { ColorEntity } from '../../color/entities/color.entity';
+import { UserEntity } from "src/users/entities/user.entity";
 
 @Entity ({name:'products'})
 export class ProductEntity {
@@ -30,7 +32,10 @@ export class ProductEntity {
     updatedAt:Timestamp;
 
     @OneToMany(()=>ColorEntity, (color)=>color.addedBy)
-    color:ColorEntity[];
+    colorId:ColorEntity[];
+
+    @ManyToOne(()=>UserEntity,(user)=>user.products)
+    addedBy:UserEntity;
 
     @ManyToMany(()=>OrderLineEntity,(orderLine)=>orderLine.addedBy)
     orderLine:OrderLineEntity[];
