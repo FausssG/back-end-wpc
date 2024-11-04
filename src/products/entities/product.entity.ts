@@ -1,10 +1,10 @@
 import { ColorEntity } from "src/color/entities/color.entity";
 import {Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, Timestamp, UpdateColumn} from "typeorm";
+import { ColorEntity } from '../../color/entities/color.entity';
+import { UserEntity } from "src/users/entities/user.entity";
 
 @Entity ({name:'products'})
 export class ProductEntity {
-
-    
 
     @PrimaryGeneratedColumn()
     id:number;
@@ -18,9 +18,6 @@ export class ProductEntity {
     @Column({type:'decimal',precision:10,scale:2,default:0})
     price: number;
 
-    @Column()
-    stock:number;
-
     @Column('simple-array')
     images:string[]; 
 
@@ -31,9 +28,10 @@ export class ProductEntity {
     updatedAt:Timestamp;
 
     @OneToMany(()=>ColorEntity, (color)=>color.product)
-    color:ColorEntity[];
+    colors:ColorEntity[];
 
-    @ManyToMany(()=>OrderLineEntity,(orderLine)=>orderLine.addedBy)
+
+    @OneToMany(()=>OrderLineEntity,(orderLine)=>orderLine.addedBy)
     orderLine:OrderLineEntity[];
 
 }
