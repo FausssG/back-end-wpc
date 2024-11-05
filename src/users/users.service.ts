@@ -26,16 +26,47 @@ export class UsersService {
   }
 
   
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+ async create(createUserDto: CreateUserDto) {
+    const user = this.usersRepository.create(createUserDto);
+
+    return  await this.usersRepository.save(user);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  findAll():Promise<UserEntity[]> {
+
+    return this.usersRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const user = await this.usersRepository.findOne({
+      where: {id:id},
+      relations: {
+        orders: true,
+        plannings:true,
+        budgets:true,
+        products:true,
+      },
+      select:{
+        orders: {
+          id: true,
+          status: true,
+        },
+        plannings:{
+          id:true,
+          status:true,
+        },
+        budgets:{
+          id:true,
+          date:true,
+        },
+        products:{
+          id:true,
+          name:true,
+        }
+      }    
+  });
+    if (!user) throw new BadRequestException(`User #${id} not found`);  
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

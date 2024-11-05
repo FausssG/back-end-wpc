@@ -1,6 +1,7 @@
 
 import { Roles } from "src/utility/common/user-roles.enum";
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, OrderedBulkOperation, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
+// import { ProductEntity } from '../../products/entities/product.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -14,7 +15,7 @@ export class UserEntity {
     password: string;
 
     @Column()
-    name: string;
+    name: string;  
 
     @Column()
     apellido: string;
@@ -28,6 +29,15 @@ export class UserEntity {
     @UpdateDateColumn()
     updatedAt: Timestamp;
 
+    @OneToMany(()=> OrderEntity, (order)=>order.user)
+    orders: orderEntity[];
 
+    @OneToMany(()=> PlanningEntity, (planning)=>planning.user)
+    plannings: PlanningEntity[];
 
+    @OneToMany(()=> BudgetEntity, (budget)=>budget.user)
+    budgets: BudgetEntity[];
+
+    @OneToMany(()=> ProductEntity, (product)=>product.user)
+    products: ProductEntity[];
 }
