@@ -8,11 +8,11 @@ import { ProductEntity } from './entities/product.entity';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-
-  @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))
+  // @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))
   @Post()
-  async create(@Body() createProductDto: CreateProductDto, @CurrentUser() currentUser:UserEntity):Promise<ProductEntity> {
-    return await this.productsService.create(createProductDto,currentUser);
+  async create(@Body() createProductDto: CreateProductDto):Promise<ProductEntity> {
+    console.log('xd');
+    return await this.productsService.create(createProductDto);
   }
 
   @Get()
@@ -25,12 +25,11 @@ export class ProductsController {
     return await this.productsService.findOne(+id);
   }
 
-
-  @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto,@CurrentUser() currentUser:UserEntity):Promise<ProductEntity> {
-    return await this.productsService.update(+id, updateProductDto, currentUser);
-  }
+  // @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))
+  // @Patch(':id')
+  // async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto):Promise<ProductEntity> {
+  //   return await this.productsService.update(+id, updateProductDto);
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

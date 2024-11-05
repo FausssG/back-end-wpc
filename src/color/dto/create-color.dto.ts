@@ -5,10 +5,9 @@ export class CreateColorDto {
     @IsString()
     name: string;
 
-
-    @IsNotEmpty({message:'No puede ser vacio'})
-    @IsNumber({maxDecimalPlaces:2},{message:'Debe ser un numero'})
-    @IsPositive({message:'Debe ser un numero positivo'})
-    productId: number;
+    
+    @IsNotEmpty({message:'El precio no puede estar vacio!'})
+    @IsNumber({maxDecimalPlaces:2},{message:'El precio no puede ser mayor a 2 decimales'})
+    price:number;
 
 }

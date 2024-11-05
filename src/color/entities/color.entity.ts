@@ -1,16 +1,20 @@
 import { ProductEntity } from "src/products/entities/product.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name:'color'})
 export class ColorEntity {
 
     @PrimaryGeneratedColumn()
-    id:number;
+    id: number;
 
-    @Column()
-    name:string;
+    @Column({unique: true})
+    name: string;
 
-    @OneToMany(()=>ProductEntity, (product)=>product.color)
-    product:ProductEntity[]
+    @Column({type: 'decimal' , precision: 10, scale: 2, default: 0.0})
+    price: number;
+  
+
+    @ManyToOne(()=>ProductEntity, (product)=>product.colors)
+    product: ProductEntity;
 
 }
