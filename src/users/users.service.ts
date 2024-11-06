@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { UserSignUpDto } from './dto/user-signup.dto';
 import { hash } from 'bcrypt';
+import { sign } from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +26,14 @@ export class UsersService {
     return user;
   }
 
+  async signin(userSignInDto:UserSignUpDto):Promise<UserEntity>{
+    const userExists=await this.usersRepository.createQueryBuilder('users').addSelect('users.password').where('users.mail=:mail',{mail:userSignInDto.email}).getOne();
+    if(!userExists) throw new BadRequestException('Email no registrado');
+    const isMatch=await hash(userSignInDto.password,10)===userExists.password;
+    if(!isMatch) throw new BadRequestException('Contraseña incorrecta');
+    delete userExists.password;
+    return userExists;
+  } 
   
  async create(createUserDto: CreateUserDto) {
     const user = this.usersRepository.create(createUserDto);
@@ -32,12 +41,12 @@ export class UsersService {
     return  await this.usersRepository.save(user);
   }
 
-  findAll():Promise<UserEntity[]> {
+  async findAll():Promise<UserEntity[]> {
 
-    return this.usersRepository.find();
+    return await this.usersRepository.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: number):Promise<UserEntity> {
     const user = await this.usersRepository.findOne({
       where: {id:id},
       relations: {
@@ -82,6 +91,9 @@ export class UsersService {
 
     }
 
+    async accessToken(user:UserEntity):Promise<string>{
+      return sign({id:user.id,mail:user.mail,roles:user.roles},process.env.ACCESS_TOKEN_SECRET_KEY,{expiresIn:process.env.ACCESS_TOKEN_EXPIRE_TIME});
+    }
 
 
 }
