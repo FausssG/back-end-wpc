@@ -40,4 +40,5 @@ export class UserEntity {
 
     @OneToMany(()=> ProductEntity, (product)=>product.user)
     products: ProductEntity[];
+
 }

@@ -2,6 +2,8 @@ import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { dataSourceOptions } from '../db/data-source';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
+import { ProductsModule } from './products/products.module';
+import { ColorModule } from './color/color.module';
 import { OrdersModule } from './orders/orders.module';
 import { PlanningModule } from './planning/planning.module';
 import { BudgetsModule } from './budgets/budgets.module';
@@ -12,6 +14,8 @@ import { CurrentUserMiddleware } from './utility/common/middlewares/current-user
   imports: [
     TypeOrmModule.forRoot(dataSourceOptions),
     UsersModule,
+    ProductsModule,
+    ColorModule],
     OrdersModule,
     PlanningModule,
     BudgetsModule,
