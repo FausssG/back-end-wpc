@@ -3,7 +3,7 @@ import { Roles } from "src/utility/common/user-roles.enum";
 import { Column, CreateDateColumn, Entity, OneToMany, OrderedBulkOperation, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
 // import { ProductEntity } from '../../products/entities/product.entity';
 
-@Entity('users')
+@Entity({name: 'users'})
 export class UserEntity {
     @PrimaryGeneratedColumn()
     id: number;
