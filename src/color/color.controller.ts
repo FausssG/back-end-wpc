@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { ColorService } from './color.service';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
@@ -11,10 +11,10 @@ export class ColorController {
   constructor(private readonly colorService: ColorService) {}
 
 
-  @UseGuards(AuthenticationGuard,AuthorizeGuard([Roles.ADMIN]))
-  @Post()
-   async create(@Body() createColorDto: CreateColorDto,@CurrentUser() currentUser:UserEntity):Promise<ColorEntity> {
-    return await this.colorService.create(createColorDto,currentUser);
+  // @UseGuards(AuthenticationGuard,AuthorizeGuard([Roles.ADMIN]))
+  @Post(':id/color')
+   async create(@Param('id', ParseIntPipe) id:number, @Body() createColorDto: CreateColorDto):Promise<ColorEntity> {
+    return await this.colorService.create(id, createColorDto);
   }
 
   @Get()

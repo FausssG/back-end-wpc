@@ -4,8 +4,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity';
 import { Repository } from 'typeorm';
-import { ColorService } from '../color/color.service';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { ColorService } from 'src/color/color.service';
 
 @Injectable()
 export class ProductsService {
@@ -15,13 +15,12 @@ export class ProductsService {
     private readonly colorService:ColorService
   ){}
   
-  async create(createProductDto: CreateProductDto, currentUser: UserEntity):Promise<ProductEntity> {
-    const product = this.productRepository.create(createProductDto);
-    const color = await this.colorService.findOne(+createProductDto.colorId);
+  async create(createProductDto: CreateProductDto):Promise<ProductEntity> {
     
-    product.colorId=[color];
-    product.addedBy=currentUser;
+    const product = this.productRepository.create(createProductDto);
+    // product.addedBy=currentUser;
     return await this.productRepository.save(product);
+
   }
 
   findAll():Promise<ProductEntity[]> {
@@ -33,17 +32,13 @@ export class ProductsService {
     const product= await this.productRepository.findOne({
       where:{id:id},
       relations:{
-        addedBy:true,
-        colorId:true,
+        colors:true,
       },
       select:{
-        addedBy:{
+        colors:{
           id:true,
           name:true,
-        },
-        colorId:{
-          id:true,
-          name:true,
+          price:true,
         }
       }
     }
@@ -52,17 +47,17 @@ export class ProductsService {
     return product;
   }
 
-  async update(id: number, updateProductDto:Partial<UpdateProductDto>,currentUser:UserEntity) {
-    const product = await this.findOne(id);
-    Object.assign(product,updateProductDto);
-    product.addedBy=currentUser;
-    if (updateProductDto.colorId){
-      const color = await this.colorService.findOne(+updateProductDto.colorId);
-      product.colorId=[color];
-    }
+  // async update(id: number, updateProductDto:Partial<UpdateProductDto>,currentUser:UserEntity) {
+  //   const product = await this.findOne(id);
+  //   Object.assign(product,updateProductDto);
+  //   // product.addedBy=currentUser;
+  //   if (updateProductDto.colorId){
+  //     const color = await this.colorService.findOne(+updateProductDto.colorId);
+  //     product.colorId=[color];
+  //   }
 
-    return await this.productRepository.save(product);
-  }
+  //   return await this.productRepository.save(product);
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} product`;

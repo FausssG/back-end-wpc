@@ -1,26 +1,42 @@
-import { Injectable } from '@nestjs/common';
-import { CreateColorDto } from './dto/create-color.dto';
-import { UpdateColorDto } from './dto/update-color.dto';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ColorEntity } from './entities/color.entity';
-import { ProductsService } from '../products/products.service';
-import { UserEntity } from 'src/users/entities/user.entity';
+import { ProductEntity } from 'src/products/entities/product.entity';
+import { CreateColorDto } from './dto/create-color.dto';
+import { UpdateColorDto } from './dto/update-color.dto';
 
 @Injectable()
 export class ColorService {
   
-  constructor(@InjectRepository(ColorEntity) private readonly colorRepository:Repository<ColorEntity>,
-  private readonly ProductsService:ProductsService
-) {}
+  constructor(
+    @InjectRepository(ColorEntity)
+    private readonly colorRepository: Repository<ColorEntity>,
+    @InjectRepository(ProductEntity)
+    private readonly productRepository: Repository<ProductEntity>,
+  ) {}
 
 
-  async create(createColorDto: CreateColorDto, currentUser:UserEntity):Promise<ColorEntity> {
-    const product= await this.ProductsService.findOne(createColorDto.productId);
-    const color=this.colorRepository.create(createColorDto);
-    color.product=product;
-    color.addedBy=[currentUser];
-    return await this.colorRepository.save(color);
+  async create(id:number, createColorDto: CreateColorDto):Promise<ColorEntity> {
+
+    try {
+      const product= await this.productRepository.findOne({where: {id}});
+
+      if (!product) throw new NotFoundException(`El producto con id ${id} no existe`);
+  
+      const color=this.colorRepository.create(createColorDto);
+  
+      color.product = product;
+  
+      return await this.colorRepository.save(color);
+    } catch (error) {
+      if (error.errno === 1062) {
+        throw new BadRequestException(`the name ${createColorDto.name} is aleady in use`);
+      }
+
+      throw error;
+    }
+
   }
 
   findAll() {
