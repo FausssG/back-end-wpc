@@ -1,32 +1,44 @@
 
 import { Roles } from "src/utility/common/user-roles.enum";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, OrderedBulkOperation, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
+// import { ProductEntity } from '../../products/entities/product.entity';
 
-@Entity('users')
+@Entity({name: 'users'})
 export class UserEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    test: string;
-
-    @Column()
+    @Column({unique:true})
     mail: string;
 
-    @Column()
+    @Column({select:false})
     password: string;
 
     @Column()
-    name: string;
+    name: string;  
 
     @Column()
-    surname: string;
-
-    @Column()
-    dateCreation: Date;
+    apellido: string;
 
     @Column({type:'enum', enum:Roles, default:Roles.USER})
     roles: Roles;
 
-    
+    @CreateDateColumn()
+    createdAt: Timestamp;
+
+    @UpdateDateColumn()
+    updatedAt: Timestamp;
+
+    @OneToMany(()=> OrderEntity, (order)=>order.user)
+    orders: orderEntity[];
+
+    @OneToMany(()=> PlanningEntity, (planning)=>planning.user)
+    plannings: PlanningEntity[];
+
+    @OneToMany(()=> BudgetEntity, (budget)=>budget.user)
+    budgets: BudgetEntity[];
+
+    @OneToMany(()=> ProductEntity, (product)=>product.user)
+    products: ProductEntity[];
+
 }
