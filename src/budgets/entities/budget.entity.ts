@@ -1,7 +1,10 @@
-import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { OrderLineEntity } from "src/order-lines/entities/order-line.entity";
+import { OrderEntity } from "src/orders/entities/order.entity";
+import { UserEntity } from "src/users/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: "budgets" })
-export class Budget {
+export class BudgetEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -13,13 +16,13 @@ export class Budget {
     expirationDate: Date;
 
     @ManyToOne(()=> UserEntity, (user)=>user.budgets)
-    user:UserEntity;
+    addedBy: UserEntity;
 
-    @OneToMany(()=> BudgetLineEntity, (budgetLine)=>budgetLine.budget)
-    budgetLines: BudgetLineEntity[];
+    @OneToMany(()=> OrderLineEntity, (orderLine)=>orderLine.budget)
+    orderLines:OrderLineEntity[];
 
-    @OneToOne(()=> OrderEntity, (order)=>order.budget)
-    order:OrderEntity;
+    @OneToOne(()=> OrderEntity, (order) => order.budget)
+    order: OrderEntity;
 
 
 }

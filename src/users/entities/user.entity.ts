@@ -1,4 +1,9 @@
 
+import { BudgetEntity } from "src/budgets/entities/budget.entity";
+import { ClientEntity } from "src/clients/entities/client.entity";
+import { OrderEntity } from "src/orders/entities/order.entity";
+import { PlanningEntity } from "src/planning/entities/planning.entity";
+import { ProductEntity } from "src/products/entities/product.entity";
 import { Roles } from "src/utility/common/user-roles.enum";
 import { Column, CreateDateColumn, Entity, OneToMany, OrderedBulkOperation, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
 // import { ProductEntity } from '../../products/entities/product.entity';
@@ -29,16 +34,19 @@ export class UserEntity {
     @UpdateDateColumn()
     updatedAt: Timestamp;
 
-    @OneToMany(()=> OrderEntity, (order)=>order.user)
-    orders: orderEntity[];
+    @OneToMany(()=> OrderEntity, (order)=>order.addedBy)
+    orders: OrderEntity[];
 
-    @OneToMany(()=> PlanningEntity, (planning)=>planning.user)
+    @OneToMany(()=> PlanningEntity, (planning)=>planning.addedBy)
     plannings: PlanningEntity[];
 
-    @OneToMany(()=> BudgetEntity, (budget)=>budget.user)
+    @OneToMany(()=> BudgetEntity, (budget)=>budget.addedBy)
     budgets: BudgetEntity[];
 
-    @OneToMany(()=> ProductEntity, (product)=>product.user)
+    @OneToMany(()=> ProductEntity, (product)=>product.addedBy)
     products: ProductEntity[];
+
+    @OneToMany(()=> ClientEntity, (client)=> client.addedBy)
+    clients: ClientEntity[];
 
 }

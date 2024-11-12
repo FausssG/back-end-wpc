@@ -1,8 +1,9 @@
+import { OrderLineEntity } from "src/order-lines/entities/order-line.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'planning'})
-export class Planning {
+export class PlanningEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -23,9 +24,9 @@ export class Planning {
     createdBy: number;
 
     @ManyToOne(()=> UserEntity, (user)=>user.plannings)
-    user:UserEntity;
+    addedBy:UserEntity;
 
-    @OneToMany(()=> OrderLineEntity, (orderLine)=>orderLine.plannings)
+    @OneToMany(()=> OrderLineEntity, (orderLine)=>orderLine.planning)
     orderLines: OrderLineEntity[];
     
 

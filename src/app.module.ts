@@ -9,13 +9,15 @@ import { PlanningModule } from './planning/planning.module';
 import { BudgetsModule } from './budgets/budgets.module';
 import { PaymentsModule } from './payments/payments.module';
 import { CurrentUserMiddleware } from './utility/common/middlewares/current-user.middleware';
+import { OrderLinesModule } from './order-lines/order-lines.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceOptions),
     UsersModule,
     ProductsModule,
-    ColorModule],
+    ColorModule,
+    OrderLinesModule,
     OrdersModule,
     PlanningModule,
     BudgetsModule,

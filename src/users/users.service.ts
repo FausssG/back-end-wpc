@@ -58,7 +58,6 @@ export class UsersService {
       select:{
         orders: {
           id: true,
-          status: true,
         },
         plannings:{
           id:true,
@@ -66,11 +65,9 @@ export class UsersService {
         },
         budgets:{
           id:true,
-          date:true,
         },
         products:{
           id:true,
-          name:true,
         }
       }    
   });

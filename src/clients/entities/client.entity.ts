@@ -1,8 +1,9 @@
+import { OrderEntity } from 'src/orders/entities/order.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('clients')
-export class Client {
+export class ClientEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -20,9 +21,9 @@ export class Client {
     modifiedBy: number;
 
     @ManyToOne(()=> UserEntity, (user)=>user.clients)
-    user:UserEntity;
+    addedBY:UserEntity;
 
-    @OneToMany(()=> OrdersEntity, (order)=>order.clients)
-    orders: OrdersEntity[];
+    @OneToMany(()=> OrderEntity, (order)=>order.client)
+    orders: OrderEntity[];
 
 }

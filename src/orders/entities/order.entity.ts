@@ -1,8 +1,11 @@
+import { BudgetEntity } from "src/budgets/entities/budget.entity";
+import { ClientEntity } from "src/clients/entities/client.entity";
+import { PaymentEntity } from "src/payments/entities/payment.entity";
 import { UserEntity } from "src/users/entities/user.entity";
-import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name:'orders'})
-export class Order {
+export class OrderEntity {
 
     @PrimaryGeneratedColumn()
     id:number;
@@ -26,15 +29,16 @@ export class Order {
     orderId:number;
 
     @ManyToOne(()=> UserEntity, (user)=>user.orders)
-    user:UserEntity;
+    addedBy:UserEntity;
 
     @OneToMany(()=> PaymentEntity, (payment)=>payment.order)
-    payment:PaymentEntity[];
+    payments:PaymentEntity[];
 
     @ManyToOne(()=> ClientEntity, (client)=>client.orders)
     client:ClientEntity;
 
     @OneToOne(()=> BudgetEntity, (budget)=>budget.order)
+    @JoinColumn()
     budget:BudgetEntity;
 
 
