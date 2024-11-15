@@ -27,9 +27,9 @@ export class ProductsController {
 
   // @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))
   // @Patch(':id')
-  // async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto):Promise<ProductEntity> {
-  //   return await this.productsService.update(+id, updateProductDto);
-  // }
+  //  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto):Promise<ProductEntity> {
+  //    return await this.productsService.update(+id, updateProductDto);
+  //  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

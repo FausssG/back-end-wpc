@@ -14,7 +14,7 @@ export class UserEntity {
     id: number;
 
     @Column({unique:true})
-    mail: string;
+    email: string;
 
     @Column({select:false})
     password: string;
@@ -23,7 +23,7 @@ export class UserEntity {
     name: string;  
 
     @Column()
-    apellido: string;
+    lastName: string;
 
     @Column({type:'enum', enum:Roles, default:Roles.USER})
     roles: Roles;

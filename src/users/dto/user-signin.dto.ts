@@ -1,7 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
 
-
-
 export class UserSignInDto {
     @IsNotEmpty({message:'El email no puede estar vacío'})
     @IsEmail({},{message: 'El email ingresado no es valido'})

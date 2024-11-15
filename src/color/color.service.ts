@@ -39,8 +39,8 @@ export class ColorService {
 
   }
 
-  findAll() {
-    return `This action returns all color`;
+  findAll():Promise<ColorEntity[]> {
+    return this.colorRepository.find();
   }
 
   findOne(id: number) {

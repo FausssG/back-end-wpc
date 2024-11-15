@@ -51,9 +51,9 @@ export class ProductsService {
   //   const product = await this.findOne(id);
   //   Object.assign(product,updateProductDto);
   //   // product.addedBy=currentUser;
-  //   if (updateProductDto.colorId){
-  //     const color = await this.colorService.findOne(+updateProductDto.colorId);
-  //     product.colorId=[color];
+  //   if (updateProductDto.d){
+  //     const color = await this.colorService.findOne(+updateProductDto.colors);
+  //     product.colors=[];
   //   }
 
   //   return await this.productRepository.save(product);
