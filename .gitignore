@@ -1,3 +1,6 @@
+# IDX
+/.idx
+
 # compiled output
 /dist
 /node_modules

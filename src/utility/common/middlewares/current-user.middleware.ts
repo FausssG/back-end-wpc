@@ -16,30 +16,31 @@ declare global {
 
 @Injectable()
 export class CurrentUserMiddleware implements NestMiddleware {
-    constructor(private readonly UsersService:UsersService){
-    }
-    async use(req: Request, res: Response, next: NextFunction) {
+  constructor(private readonly UsersService:UsersService){}
+
+  async use(req: Request, res: Response, next: NextFunction) {
+
     const authHeader=req.headers.authorization || req.headers.Authorization;
+
     if (!authHeader || isArray(authHeader) || !authHeader.startsWith('Bearer ')) {
-            req.currentUser=null;
-            next();
-            return;
-    }else {
+      req.currentUser=null;
+      next();
+      return;
+    } else {
       try {
         const token = authHeader.split(' ')[1];
-        const {id}=verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
-        const currentUser=await this.UsersService.findOne(id);
-        req.currentUser=currentUser;
+        const {id} = <JwtPayload>verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
+        const currentUser = await this.UsersService.findOne(+id);
+        req.currentUser = currentUser;
         next();
       } catch (error) {
-        req.currentUser=null;
+        req.currentUser = null;
         next();
+      }
     }
   }
-
-  }
-  
 }
+
 interface JwtPayload {
   id: string;
 }
