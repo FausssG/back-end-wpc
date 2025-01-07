@@ -11,7 +11,7 @@ CanActivate {
 
         const allowedRoles = this.reflector.get<string[]>('allowedRoles', context.getHandler());
         const request=context.switchToHttp().getRequest();
-        const result = request?.currentUser?.roles.map((role:string) => allowedRoles.includes(role)).find((val:boolean)=>val===true);
+        const result = allowedRoles.includes(request?.currentUser?.roles);
         if (result) return true;
         throw new UnauthorizedException('Lo siento, no estas autorizado!');
     

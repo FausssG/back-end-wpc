@@ -41,7 +41,7 @@ export class UsersController {
   }
 
   // Mostrar todos los usuarios por parte del Admin
-  @AuthorizeRoles(Roles.ADMIN)
+  // @AuthorizeRoles(Roles.USER)
   @UseGuards(AuthenticationGuard) 
   @Get('all')
   async findAll(@CurrentUser() currentUser:UserEntity): Promise<UserEntity[]> {

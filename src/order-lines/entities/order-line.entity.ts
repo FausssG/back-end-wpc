@@ -3,7 +3,7 @@ import { PlanningEntity } from "src/planning/entities/planning.entity";
 import { ProductEntity } from "src/products/entities/product.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({ name: "orderLines" })
+@Entity({ name: "orderlines" })
 export class OrderLineEntity {
 
     @PrimaryGeneratedColumn()
@@ -15,18 +15,14 @@ export class OrderLineEntity {
     @Column()
     quantity:number;
 
-
     @ManyToOne(()=> BudgetEntity, (budget)=>budget.orderLines)
     budget: BudgetEntity;
-
 
     @ManyToOne(()=> PlanningEntity, (planning)=> planning.orderLines)
     planning: PlanningEntity;
 
     @ManyToOne(()=> ProductEntity, (product)=>product.orderLines)
     product:ProductEntity;
-    
-
 
 
 }

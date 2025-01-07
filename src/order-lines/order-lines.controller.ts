@@ -3,7 +3,7 @@ import { OrderLinesService } from './order-lines.service';
 import { CreateOrderLineDto } from './dto/create-order-line.dto';
 import { UpdateOrderLineDto } from './dto/update-order-line.dto';
 
-@Controller('order-lines')
+@Controller('orderlines')
 export class OrderLinesController {
   constructor(private readonly orderLinesService: OrderLinesService) {}
 

@@ -13,12 +13,7 @@ import { OrderLinesModule } from './order-lines/order-lines.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(
-      {
-        ...dataSourceOptions,
-        synchronize: false,
-      }
-    ),
+    TypeOrmModule.forRoot(dataSourceOptions),
     UsersModule,
     ProductsModule,
     ColorModule,
