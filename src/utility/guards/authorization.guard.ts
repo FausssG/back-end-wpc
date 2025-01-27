@@ -1,20 +1,29 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { Role } from '../common/user-roles.enum';
 
 @Injectable()
-export class AuthorizeGuard implements 
-CanActivate {
+export class AuthorizeGuard implements CanActivate {
+  constructor(private readonly reflector: Reflector) {}
 
-    constructor(private readonly reflector: Reflector) {}
+  canActivate(context: ExecutionContext): boolean {
+    const allowedRoles = this.reflector.get<string[]>(
+      'allowedRoles',
+      context.getHandler(),
+    );
+    const { currentUser } = context.switchToHttp().getRequest();
 
-    canActivate(context: ExecutionContext): boolean {
+    if (currentUser.role === Role.ADMIN) return true;
 
-        const allowedRoles = this.reflector.get<string[]>('allowedRoles', context.getHandler());
-        const request=context.switchToHttp().getRequest();
-        const result = allowedRoles.includes(request?.currentUser?.roles);
-        if (result) return true;
-        throw new UnauthorizedException('Lo siento, no estas autorizado!');
-    
-    }
+    const result = allowedRoles.includes(currentUser.role);
 
+    if (result) return true;
+
+    throw new UnauthorizedException('Lo siento, no estas autorizado!');
+  }
 }

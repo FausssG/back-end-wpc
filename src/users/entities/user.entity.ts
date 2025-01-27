@@ -1,52 +1,63 @@
+import { BudgetEntity } from 'src/budgets/entities/budget.entity';
+import { ClientEntity } from 'src/clients/entities/client.entity';
+import { OrderEntity } from 'src/orders/entities/order.entity';
+import { PlanningEntity } from 'src/planning/entities/planning.entity';
+import { ProductEntity } from 'src/products/entities/product.entity';
+import { Role } from 'src/utility/common/user-roles.enum';
 
-import { BudgetEntity } from "src/budgets/entities/budget.entity";
-import { ClientEntity } from "src/clients/entities/client.entity";
-import { OrderEntity } from "src/orders/entities/order.entity";
-import { PlanningEntity } from "src/planning/entities/planning.entity";
-import { ProductEntity } from "src/products/entities/product.entity";
-import { Roles } from "src/utility/common/user-roles.enum";
-import { Column, CreateDateColumn, Entity, OneToMany, OrderedBulkOperation, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
-// import { ProductEntity } from '../../products/entities/product.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Timestamp,
+} from 'typeorm';
 
-@Entity({name: 'users'})
+@Entity({ name: 'users' })
 export class UserEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({unique:true})
-    email: string;
+  @Column()
+  firstName: string;
 
-    @Column({select:false})
-    password: string;
+  @Column()
+  lastName: string;
 
-    @Column()
-    name: string;  
+  @Column({ unique: true })
+  email: string;
 
-    @Column()
-    lastName: string;
+  @Column({ nullable: true })
+  password: string;
 
-    @Column({type:'enum', enum:Roles, default:Roles.USER})
-    roles: Roles;
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  role: Role;
 
-    @CreateDateColumn()
-    createdAt: Timestamp;
+  @Column({ type: 'boolean', default: false })
+  active: boolean;
 
-    @UpdateDateColumn()
-    updatedAt: Timestamp;
+  @Column({ type: 'uuid', unique: true, nullable: true, name: 'activation_token' })
+  activationToken: string;
+  
+  @Column({ type: 'uuid', unique: true, nullable: true, name: 'reset_password_token' })
+  resetPasswordToken: string;
 
-    @OneToMany(()=> OrderEntity, (order)=>order.addedBy)
-    orders: OrderEntity[];
+  @CreateDateColumn({name: 'created_at'})
+  createdAt: Timestamp;
 
-    @OneToMany(()=> PlanningEntity, (planning)=>planning.addedBy)
-    plannings: PlanningEntity[];
+  @OneToMany(() => OrderEntity, (order) => order.addedBy)
+  orders: OrderEntity[];
 
-    @OneToMany(()=> BudgetEntity, (budget)=>budget.addedBy)
-    budgets: BudgetEntity[];
+  @OneToMany(() => PlanningEntity, (planning) => planning.addedBy)
+  plannings: PlanningEntity[];
 
-    @OneToMany(()=> ProductEntity, (product)=>product.addedBy)
-    products: ProductEntity[];
+  @OneToMany(() => BudgetEntity, (budget) => budget.addedBy)
+  budgets: BudgetEntity[];
 
-    @OneToMany(()=> ClientEntity, (client)=> client.addedBy)
-    clients: ClientEntity[];
+  @OneToMany(() => ProductEntity, (product) => product.addedBy)
+  products: ProductEntity[];
 
+  @OneToMany(() => ClientEntity, (client) => client.addedBy)
+  clients: ClientEntity[];
 }
