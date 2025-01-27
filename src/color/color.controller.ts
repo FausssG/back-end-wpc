@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntP
 import { ColorService } from './color.service';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
-import { Roles } from 'src/utility/common/user-roles.enum';
+import { Role } from 'src/utility/common/user-roles.enum';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ColorEntity } from './entities/color.entity';
 
