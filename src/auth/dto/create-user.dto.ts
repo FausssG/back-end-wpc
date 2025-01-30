@@ -1,5 +1,4 @@
-import {IsNotEmpty, IsString, IsEmail, IsEnum, IsOptional} from "class-validator";
-import { Role } from "src/utility/common/user-roles.enum";
+import {IsNotEmpty, IsString, IsEmail, IsOptional, IsNumber} from "class-validator";
 
 export class CreateUserDto {
 
@@ -15,7 +14,7 @@ export class CreateUserDto {
     @IsString({message: 'El apellido debe ser cadena de texto'})
     lastName:string
 
-    @IsEnum(Role)
+    @IsNumber()
     @IsOptional()
-    rol: Role;
+    roleId: number;
 }

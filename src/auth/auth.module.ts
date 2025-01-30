@@ -4,9 +4,10 @@ import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ValidatorService } from './validator.service';
+import { RolesModule } from '../roles/roles.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity])],
+  imports: [RolesModule, TypeOrmModule.forFeature([UserEntity])],
   controllers: [AuthController],
   providers: [AuthService, ValidatorService],
   exports: [ValidatorService]

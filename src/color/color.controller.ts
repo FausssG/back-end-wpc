@@ -2,16 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntP
 import { ColorService } from './color.service';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
-import { Role } from 'src/utility/common/user-roles.enum';
-import { UserEntity } from 'src/users/entities/user.entity';
 import { ColorEntity } from './entities/color.entity';
 
 @Controller('color')
 export class ColorController {
   constructor(private readonly colorService: ColorService) {}
 
-
-  // @UseGuards(AuthenticationGuard,AuthorizeGuard([Roles.ADMIN]))
   @Post(':id/color')
    async create(@Param('id', ParseIntPipe) id:number, @Body() createColorDto: CreateColorDto):Promise<ColorEntity> {
     return await this.colorService.create(id, createColorDto);

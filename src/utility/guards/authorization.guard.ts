@@ -1,29 +1,43 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Role } from '../common/user-roles.enum';
+import { Permission } from 'src/roles/dto/role.dto';
+import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 
 @Injectable()
-export class AuthorizeGuard implements CanActivate {
+export class AuthorizationGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const allowedRoles = this.reflector.get<string[]>(
-      'allowedRoles',
-      context.getHandler(),
-    );
     const { currentUser } = context.switchToHttp().getRequest();
 
-    if (currentUser.role === Role.ADMIN) return true;
+    const routePermissions = this.reflector.get<Permission[]>(
+      PERMISSIONS_KEY,
+      context.getHandler(),
+    );
+    
+    if (!routePermissions) return true;
 
-    const result = allowedRoles.includes(currentUser.role);
+    const userPermissions = currentUser.role.permissions;
+    for (const permission of routePermissions) {
+      const userPermission = userPermissions.find(
+        (perm) => perm.resource === permission.resource,
+      );
 
-    if (result) return true;
+      if (!userPermission) throw new UnauthorizedException();
 
-    throw new UnauthorizedException('Lo siento, no estas autorizado!');
+      const allActionsAvailable = permission.actions.every((requiredAction) =>
+        userPermission.actions.includes(requiredAction),
+      );
+
+      if (!allActionsAvailable) throw new UnauthorizedException();
+    }
+    
+    return true;
   }
 }

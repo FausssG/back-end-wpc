@@ -18,7 +18,7 @@ export class ValidatorService {
   ) {}
 
   async validateUserExistsById(userId: string): Promise<UserEntity> {
-    const userExists = await this.authRepository.findOneBy({ id: userId });
+    const userExists = await this.authRepository.findOne({ where: {id: userId}, relations: ['role'] });
     if (!userExists) {
       throw new NotFoundException({
         code: 'USER_NOT_FOUND',
@@ -29,7 +29,7 @@ export class ValidatorService {
   }
 
   async validateUserExistsByEmail(email: string): Promise<UserEntity> {
-    const userExists = await this.authRepository.findOneBy({ email });
+    const userExists = await this.authRepository.findOne({where:{email}, relations: ['role']});
 
     if (!userExists) {
       throw new NotFoundException({
