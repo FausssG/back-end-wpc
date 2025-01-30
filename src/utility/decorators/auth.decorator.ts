@@ -1,12 +1,12 @@
-import { applyDecorators, SetMetadata, UseGuards } from '@nestjs/common';
-import { Role } from '../common/user-roles.enum';
+import { applyDecorators, UseGuards } from '@nestjs/common';
 import { AuthenticationGuard } from '../guards/authentication.guard';
-import { AuthorizeGuard } from '../guards/authorization.guard';
-import { AuthorizeRoles } from './authorize-roles.decorator';
+import { AuthorizationGuard } from '../guards/authorization.guard';
+import { Permissions } from 'src/utility/decorators/permissions.decorator';
+import { Permission } from 'src/roles/interfaces/permission.interface';
 
-export function Auth(...roles: Role[]) {
+export function Auth(permissions: Permission[]) {
   return applyDecorators(
-    AuthorizeRoles(...roles),
-    UseGuards(AuthenticationGuard, AuthorizeGuard),
+    Permissions(permissions),
+    UseGuards(AuthenticationGuard, AuthorizationGuard),
   );
 }

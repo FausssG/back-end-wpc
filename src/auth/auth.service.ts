@@ -20,6 +20,7 @@ import { ActivateUserDto } from './dto/activate-user.dto';
 import { RequestResetPasswordDto } from './dto/request-reset-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +30,7 @@ export class AuthService {
     @Inject('IMailService')
     private mailsService: IMailService,
     private validatorService: ValidatorService,
+    private roleService: RolesService,
   ) {}
 
   async inviteUserToStaff(
@@ -107,11 +109,12 @@ export class AuthService {
     const user = await this.validatorService.validateUserExistsByEmail(email);
 
     await this.validatorService.validateUserPassword(password, user.password);
+  
 
     const payload: JwtPayload = {
       id: user.id,
       email: user.email,
-      rol: user.role,
+      roleId: user.role.id,
       active: user.active,
     };
 
@@ -185,5 +188,15 @@ export class AuthService {
     user.password = await bcryptjs.hashSync(password, 10);
 
     await this.authRepository.save(user);
+  }
+
+  async setRole(roleId: number, userId: string) {
+    const user = await this.validatorService.validateUserExistsById(userId);
+
+    const role = await this.roleService.findOne(roleId);
+
+    user.role = role;
+
+    this.authRepository.save(user);
   }
 }

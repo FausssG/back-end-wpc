@@ -16,15 +16,18 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { UserEntity } from '../users/entities/user.entity';
 import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
-import { Role } from 'src/utility/common/user-roles.enum';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { Auth } from 'src/utility/decorators/auth.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Auth(Role.ADMIN)
+  @Patch('set-role')
+  async setRole(@Body('roleId') roleId: string, @Body('userId') userId: string) {
+    await this.authService.setRole(+roleId, userId)
+  }
+
+
   @Post('staff/invite')
   async invite(@Body() inviteUserDto: CreateUserDto): Promise<void> {
     return await this.authService.inviteUserToStaff(inviteUserDto);
@@ -68,7 +71,7 @@ export class AuthController {
     return await this.authService.changePassword(changePasswordDto, user);
   }
 
-  @Auth(Role.USER)
+
   @Get('profile')
   async profile(@CurrentUser() user: UserEntity): Promise<Partial<UserEntity>> {
     const { password, active, activationToken, resetPasswordToken, ...rest } =
@@ -76,7 +79,6 @@ export class AuthController {
     return rest;
   }
 
-  @Auth(Role.ADMIN)
   @Get('test')
   async test() {
     return {test: 'test'};

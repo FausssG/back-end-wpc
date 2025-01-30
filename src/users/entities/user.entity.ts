@@ -3,12 +3,13 @@ import { ClientEntity } from 'src/clients/entities/client.entity';
 import { OrderEntity } from 'src/orders/entities/order.entity';
 import { PlanningEntity } from 'src/planning/entities/planning.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
-import { Role } from 'src/utility/common/user-roles.enum';
+import { RoleEntity } from 'src/roles/entities/role.entity';
 
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   Timestamp,
@@ -30,9 +31,6 @@ export class UserEntity {
 
   @Column({ nullable: true })
   password: string;
-
-  @Column({ type: 'enum', enum: Role, default: Role.USER })
-  role: Role;
 
   @Column({ type: 'boolean', default: false })
   active: boolean;
@@ -60,4 +58,7 @@ export class UserEntity {
 
   @OneToMany(() => ClientEntity, (client) => client.addedBy)
   clients: ClientEntity[];
+
+  @ManyToOne(() => RoleEntity, (role) => role.users)
+  role: RoleEntity;
 }
