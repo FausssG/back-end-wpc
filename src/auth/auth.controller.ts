@@ -17,16 +17,16 @@ import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { UserEntity } from '../users/entities/user.entity';
 import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ChangeRoleDto } from './dto/change-role.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Patch('set-role')
-  async setRole(@Body('roleId') roleId: string, @Body('userId') userId: string) {
-    await this.authService.setRole(+roleId, userId)
+  @Patch('change-role')
+  async changeRole(@Body() changeRoleDto: ChangeRoleDto): Promise<void> {
+    await this.authService.changeRole(changeRoleDto)
   }
-
 
   @Post('staff/invite')
   async invite(@Body() inviteUserDto: CreateUserDto): Promise<void> {

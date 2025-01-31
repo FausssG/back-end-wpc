@@ -46,6 +46,7 @@ export class ValidatorService {
     userPassword: string,
   ): Promise<boolean> {
     const result = await bcryptjs.compare(password, userPassword);
+
     if (!result)
       throw new UnauthorizedException('Please check your credentials.');
     return result;
