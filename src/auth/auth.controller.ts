@@ -17,16 +17,17 @@ import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { UserEntity } from '../users/entities/user.entity';
 import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ChangeRoleDto } from './dto/change-role.dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Patch('set-role')
-  async setRole(@Body('roleId') roleId: string, @Body('userId') userId: string) {
-    await this.authService.setRole(+roleId, userId)
+  @Patch('change-role')
+  async changeRole(@Body() changeRoleDto: ChangeRoleDto): Promise<void> {
+    await this.authService.changeRole(changeRoleDto)
   }
-
 
   @Post('staff/invite')
   async invite(@Body() inviteUserDto: CreateUserDto): Promise<void> {
@@ -71,7 +72,7 @@ export class AuthController {
     return await this.authService.changePassword(changePasswordDto, user);
   }
 
-
+  @UseGuards(AuthenticationGuard)
   @Get('profile')
   async profile(@CurrentUser() user: UserEntity): Promise<Partial<UserEntity>> {
     const { password, active, activationToken, resetPasswordToken, ...rest } =
@@ -79,8 +80,17 @@ export class AuthController {
     return rest;
   }
 
-  @Get('test')
-  async test() {
-    return {test: 'test'};
+  @UseGuards(AuthenticationGuard)
+  @Get('check-token')
+  async checkToken(@CurrentUser() user: UserEntity) {
+    const payload: JwtPayload = {
+      id: user.id,
+      email: user.email,
+      roleId: user.role ? user.role.id : null,
+      active: user.active,
+    };
+    return {token: await this.authService.accessToken(payload)}
   }
+  
+
 }

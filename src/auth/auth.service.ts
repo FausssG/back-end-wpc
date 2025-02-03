@@ -21,6 +21,7 @@ import { RequestResetPasswordDto } from './dto/request-reset-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RolesService } from 'src/roles/roles.service';
+import { ChangeRoleDto } from './dto/change-role.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,8 +44,9 @@ export class AuthService {
 
   private async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     let user = this.authRepository.create(createUserDto);
-
+    const {roleId} = createUserDto;
     try {
+      user.role = await this.roleService.findOne(roleId);
       user = await this.authRepository.save(user);
       return user;
     } catch (error) {
@@ -104,17 +106,17 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<{ accessToken: string }> {
-    const { email, password } = loginDto;
 
+    const { email, password } = loginDto;
+    
     const user = await this.validatorService.validateUserExistsByEmail(email);
 
     await this.validatorService.validateUserPassword(password, user.password);
-  
 
     const payload: JwtPayload = {
       id: user.id,
       email: user.email,
-      roleId: user.role.id,
+      roleId: user.role ? user.role.id : null,
       active: user.active,
     };
 
@@ -190,7 +192,11 @@ export class AuthService {
     await this.authRepository.save(user);
   }
 
-  async setRole(roleId: number, userId: string) {
+
+  async changeRole(changeRoleDto: ChangeRoleDto): Promise<void> {
+
+    const { userId, roleId } = changeRoleDto;
+
     const user = await this.validatorService.validateUserExistsById(userId);
 
     const role = await this.roleService.findOne(roleId);
