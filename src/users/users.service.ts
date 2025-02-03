@@ -69,8 +69,22 @@ export class UsersService {
       currentUser.password,
     );
 
-    //! TODO: Delete user
-    // await this.userRepository.delete(userId);
-    console.log('eliminando usuario');
+    await this.userRepository.delete(userId);
   }
+
+  async findAll() {
+    const users = await this.userRepository.find({
+      relations: ['role'],
+    });
+
+    return users.map(({ password, activationToken, resetPasswordToken, ...user }) => user);
+  }
+
+  async findOne(id:string) {
+    const user = await this.validatorService.validateUserExistsById(id);
+    const {password, activationToken, resetPasswordToken, ...rest} = user;
+    return rest;
+  }
+
+  
 }

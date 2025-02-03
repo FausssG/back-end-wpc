@@ -9,6 +9,7 @@ import { UserEntity } from '../users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
+import { RoleEntity } from 'src/roles/entities/role.entity';
 
 @Injectable()
 export class ValidatorService {
@@ -60,7 +61,7 @@ export class ValidatorService {
       active: false,
     });
     if (!userExists) {
-      throw new UnprocessableEntityException(
+      throw new UnauthorizedException(
         'Está accion no puede ser completada.',
       );
     }
@@ -89,5 +90,9 @@ export class ValidatorService {
         message: 'El usuario ya está activado.',
       });
     }
+  }
+
+  async validateUserRole(role: RoleEntity) {
+    return await this.authRepository.findOne({ where: {role}}) 
   }
 }

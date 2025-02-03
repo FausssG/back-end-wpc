@@ -44,8 +44,9 @@ export class AuthService {
 
   private async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     let user = this.authRepository.create(createUserDto);
-
+    const {roleId} = createUserDto;
     try {
+      user.role = await this.roleService.findOne(roleId);
       user = await this.authRepository.save(user);
       return user;
     } catch (error) {
@@ -105,12 +106,12 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<{ accessToken: string }> {
-    const { email, password } = loginDto;
 
+    const { email, password } = loginDto;
+    
     const user = await this.validatorService.validateUserExistsByEmail(email);
 
     await this.validatorService.validateUserPassword(password, user.password);
-  
 
     const payload: JwtPayload = {
       id: user.id,
