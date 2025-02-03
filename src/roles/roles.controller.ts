@@ -12,6 +12,11 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
+  @Get('resources')
+  getResources() {
+    return this.rolesService.getResourcesWithActions();
+  }
+
   @Auth([{resource: Resource.users, actions: [Action.read, Action.create, Action.update]}])
   @Get('/:id')
   async getRoleById(@Param('id') id:string) {

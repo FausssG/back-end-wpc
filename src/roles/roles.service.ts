@@ -4,7 +4,7 @@ import { RoleEntity } from './entities/role.entity';
 import { Repository } from 'typeorm';
 import { CreateRoleDto } from './dto/role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { ValidatorService } from 'src/auth/validator.service';
+import { Action } from './enums/action.enum';
 
 @Injectable()
 export class RolesService {
@@ -13,6 +13,34 @@ export class RolesService {
     private roleRepository: Repository<RoleEntity>,
   ) {}
 
+  private resourceActions = {
+    auth: [
+      Action.read,
+      Action.create,
+      Action.update,
+      Action.delete,
+      // Action.activate,
+    ],
+    product: [
+      Action.read,
+      Action.create,
+      Action.update,
+      Action.delete,
+      // Action.list,
+    ],
+    // Otros recursos
+  };
+
+  getActionsForResource(resource: string) {
+    // Devolver solo las acciones que aplican al recurso
+    return this.resourceActions[resource] || [];
+  }
+
+  getResourcesWithActions() {
+    // Devolver solo las acciones que aplican al recurso
+    return this.resourceActions;
+  }
+
   async createRole(createRoleDto: CreateRoleDto): Promise<RoleEntity> {
     const newRole = await this.roleRepository.create(createRoleDto);
 
@@ -20,7 +48,16 @@ export class RolesService {
   }
 
   async findOne(id: number) {
-    return await this.roleRepository.findOneBy({id});
+    const role = await this.roleRepository.findOneBy({id});
+
+    if (!role) {
+      throw new NotFoundException({
+        code: 'ROLE_NOT_FOUND',
+        message: 'Rol no encontrado',
+      });
+    }
+
+    return role
   }
 
   async updateRole(id: number, updateRoleDto: UpdateRoleDto) {
