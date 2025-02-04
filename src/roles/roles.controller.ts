@@ -17,7 +17,7 @@ export class RolesController {
     return this.rolesService.getResourcesWithActions();
   }
 
-  @Auth([{resource: Resource.users, actions: [Action.read, Action.create, Action.update]}])
+  // @Auth([{resource: Resource.users, actions: [Action.read, Action.create, Action.update]}])
   @Get('/:id')
   async getRoleById(@Param('id') id:string) {
     return await this.rolesService.findOne(+id);

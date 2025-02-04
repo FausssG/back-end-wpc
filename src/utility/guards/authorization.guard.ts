@@ -32,7 +32,7 @@ export class AuthorizationGuard implements CanActivate {
       if (!userPermission) throw new UnauthorizedException();
 
       const allActionsAvailable = permission.actions.every((requiredAction) =>
-        userPermission.actions.includes(requiredAction),
+        userPermission.actions.includes(requiredAction)
       );
 
       if (!allActionsAvailable) throw new UnauthorizedException();
