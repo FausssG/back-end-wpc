@@ -1,26 +1,88 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ClientEntity } from './entities/client.entity';
+import { Repository } from 'typeorm';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { clientsValidatorService } from './clients.validator.service';
 
 @Injectable()
 export class ClientsService {
-  create(createClientDto: CreateClientDto) {
-    return 'This action adds a new client';
+  constructor(
+    @InjectRepository(ClientEntity)
+    private readonly clientRepository: Repository<ClientEntity>,
+    private clientsValidatorService: clientsValidatorService,
+  ) {}
+
+  async create(
+    createClientDto: CreateClientDto,
+    currentUser: UserEntity,
+  ): Promise<ClientEntity> {
+    const newClient = await this.clientRepository.create(createClientDto);
+
+    newClient.addedBy = currentUser;
+
+    return await this.saveClient(newClient);
   }
 
-  findAll() {
-    return `This action returns all clients`;
+  async update(
+    id: number,
+    updateClientDto: UpdateClientDto,
+    currentUser: UserEntity,
+  ): Promise<ClientEntity> {
+    const client =
+      await this.clientsValidatorService.validateClientsExistsByIdAndRelations(
+        id
+      );
+
+    await this.clientRepository.merge(client, updateClientDto);
+
+    client.modifiedBy = currentUser;
+
+    return await this.saveClient(client);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} client`;
+  private async saveClient(client: ClientEntity) {
+    try {
+      return await this.clientRepository.save(client);
+    } catch (error) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException({
+          code: 'IDENTIFICATION_ALREADY_REGISTERED',
+          message: 'El número de identificación ya está registrado',
+        });
+      }
+      throw new InternalServerErrorException({
+        code: 'UPDATE_FAILED',
+        message: 'Error al actualizar el cliente',
+      });
+    }
   }
 
-  update(id: number, updateClientDto: UpdateClientDto) {
-    return `This action updates a #${id} client`;
+  // 🔹 Obtener todos los clientes
+  async findAll(): Promise<ClientEntity[]> {
+    return await this.clientRepository.find();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} client`;
+  // 🔹 Obtener un cliente por ID
+  async findOne(id: number): Promise<ClientEntity> {
+    return this.clientsValidatorService.validateClientsExistsByIdAndRelations(
+      id,
+    );
+  }
+
+  async remove(id: number) {
+    await this.clientsValidatorService.validateClientHasNoOrders(id);
+
+    try {
+      await this.clientRepository.delete(id);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }

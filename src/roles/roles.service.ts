@@ -81,23 +81,21 @@ export class RolesService {
   }
 
   async remove(roleId: number) {
+    const role = await this.roleRepository.findOne({where: {id: roleId}, relations: ['users']})
+
+    if(!role) throw new NotFoundException({
+      code: 'ROLE_NOT_FOUND',
+      message: 'Rol no encontrado',
+    });
+
+    if (role.users.length !== 0) throw new UnprocessableEntityException({
+      code: 'ROLE_HAS_USERS',
+      message: 'No se puede eliminar el rol, está asignado a un usuario',
+    })
+
     try {
-      const role = await this.roleRepository.findOne({where: {id: roleId}, relations: ['users']})
-
-      if(!role) throw new Error('No se encontro el rol')
-
-      if (role.users.length !== 0) throw new Error('No se puede eliminar el rol, está asignado a un usuario')
-
       await this.roleRepository.delete(roleId);
     } catch (error) {
-      if (error.message === 'No se puede eliminar el rol, está asignado a un usuario'){
-        throw new UnprocessableEntityException(error.message);
-      }
-
-      if (error.message === 'No se encontro el rol') {
-        throw new NotFoundException(error.message);
-      }
-
       throw new InternalServerErrorException();
     }
   }
