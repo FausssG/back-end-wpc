@@ -1,38 +1,42 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,UseGuards } from '@nestjs/common';
-import { ProductsService } from './products.service';
+// product.controller.ts
+import { Controller, Get, Post, Body, Param, Put, Delete, Patch } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductsService } from './products.service';
+import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { ProductEntity } from './entities/product.entity';
+import { Auth } from 'src/utility/decorators/auth.decorator';
+import { Resource } from 'src/roles/enums/resource.enum';
+import { Action } from 'src/roles/enums/action.enum';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productService: ProductsService) {}
 
-  // @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))
+  @Auth([{resource: Resource.users, actions: [Action.create]}])
   @Post()
-  async create(@Body() createProductDto: CreateProductDto):Promise<ProductEntity> {
-    console.log('xd');
-    return await this.productsService.create(createProductDto);
+  async create(@Body() createProductDto: CreateProductDto, @CurrentUser() currentUser: UserEntity ): Promise<ProductEntity> {
+    return this.productService.create(createProductDto, currentUser);
   }
 
-  @Get()
-  findAll() {
-    return this.productsService.findAll();
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto, @CurrentUser() currentUser: UserEntity ): Promise<ProductEntity> {
+    return await this.productService.update(+id, updateProductDto, currentUser);
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.productsService.findOne(+id);
+  @Patch('activate/:id')
+  async activate(@Param('id') id: string): Promise<void> {
+    return await this.productService.changeStatus(+id, true);
   }
 
-  // @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))
-  // @Patch(':id')
-  //  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto):Promise<ProductEntity> {
-  //    return await this.productsService.update(+id, updateProductDto);
-  //  }
+  @Patch('deActivate/:id')
+  async deActivate(@Param('id') id: string): Promise<void> {
+    return await this.productService.changeStatus(+id, false);
+  }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return this.productService.remove(+id);
   }
 }

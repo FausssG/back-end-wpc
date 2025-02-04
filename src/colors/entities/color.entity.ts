@@ -10,10 +10,4 @@ export class ColorEntity {
     @Column({unique: true})
     name: string;
 
-    @Column({type: 'decimal' , precision: 10, scale: 2, default: 0.0})
-    price: number;
-
-    @ManyToOne(()=>ProductEntity, (product)=>product.colors)
-    product: ProductEntity;
-
 }

@@ -1,8 +1,7 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { dataSourceOptions } from '../db/data-source';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductsModule } from './products/products.module';
-import { ColorModule } from './color/color.module';
+import { ColorsModule } from './colors/colors.module';
 import { OrdersModule } from './orders/orders.module';
 import { PlanningModule } from './planning/planning.module';
 import { BudgetsModule } from './budgets/budgets.module';
@@ -15,6 +14,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { ClientsModule } from './clients/clients.module';
+import { ProfilesModule } from './profiles/profiles.module';
+import { ProductsModule } from './products/products.module';
 
 
 @Module({
@@ -24,7 +25,7 @@ import { ClientsModule } from './clients/clients.module';
       isGlobal: true,
     }),
     ProductsModule,
-    ColorModule,
+    ColorsModule,
     OrderLinesModule,
     OrdersModule,
     PlanningModule,
@@ -34,7 +35,8 @@ import { ClientsModule } from './clients/clients.module';
     AuthModule,
     UsersModule,
     RolesModule,
-    ClientsModule
+    ClientsModule,
+    ProfilesModule
   ],
   controllers: [],
   providers: [],
