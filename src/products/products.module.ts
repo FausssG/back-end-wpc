@@ -1,17 +1,15 @@
 import { Module } from '@nestjs/common';
-import { ProductsService } from './products.service';
+import { ColorsModule } from 'src/color/colors.module';
+import { ProfilesModule } from 'src/profile/profiles.module';
 import { ProductsController } from './products.controller';
-import { ProductEntity } from './entities/product.entity';
+import { ProductsService } from './products.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ColorEntity } from 'src/color/entities/color.entity';
-import { ColorModule } from 'src/color/color.module';
-import { ColorController } from 'src/color/color.controller';
-import { ColorService } from 'src/color/color.service';
+import { ProductEntity } from './entities/product.entity';
 
 @Module({
-  controllers: [ProductsController, ColorController],
-  providers: [ProductsService, ColorService],
-  imports: [TypeOrmModule.forFeature([ProductEntity, ColorEntity])],
+  imports: [TypeOrmModule.forFeature([ProductEntity]), ColorsModule, ProfilesModule],
+  controllers: [ProductsController],
+  providers: [ProductsService],
   exports:[ProductsService]
 })
 export class ProductsModule {}

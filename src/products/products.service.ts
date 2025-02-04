@@ -1,65 +1,124 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+// product.service.ts
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { ColorsService } from 'src/color/colors.service';
+import { ProfilesService } from '../profile/profiles.service';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { ColorService } from 'src/color/color.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectRepository(ProductEntity) private readonly productRepository:Repository<ProductEntity>,
+    @InjectRepository(ProductEntity)
+    private productRepository: Repository<ProductEntity>,
+    private colorService: ColorsService,
+    private profileService: ProfilesService,
+  ) {}
 
-    private readonly colorService:ColorService
-  ){}
-  
-  async create(createProductDto: CreateProductDto):Promise<ProductEntity> {
-    
-    const product = this.productRepository.create(createProductDto);
-    // product.addedBy=currentUser;
-    return await this.productRepository.save(product);
-
-  }
-
-  findAll():Promise<ProductEntity[]> {
-    return this.productRepository.find();
-  }
-
-  async findOne(id: number) {
-
-    const product= await this.productRepository.findOne({
-      where:{id:id},
-      relations:{
-        colors:true,
-      },
-      select:{
-        colors:{
-          id:true,
-          name:true,
-          price:true,
-        }
-      }
-    }
+  async create(
+    createProductDto: CreateProductDto,
+    currentUser: UserEntity,
+  ): Promise<ProductEntity> {
+    // Validar si la combinación ya existe
+    const existingColor = await this.colorService.findOne(
+      createProductDto.colorId,
     );
-    if(!product) throw new NotFoundException(`Product #${id} not found`);
-    return product;
+
+    const existingProfile = await this.profileService.findOne(
+      createProductDto.profileId,
+    );
+
+    const product = this.productRepository.create(createProductDto);
+
+    product.color = existingColor;
+
+    product.profile = existingProfile;
+
+    product.addedBy = currentUser;
+
+    return await this.saveProduct(product);
   }
 
-  // async update(id: number, updateProductDto:Partial<UpdateProductDto>,currentUser:UserEntity) {
-  //   const product = await this.findOne(id);
-  //   Object.assign(product,updateProductDto);
-  //   // product.addedBy=currentUser;
-  //   if (updateProductDto.d){
-  //     const color = await this.colorService.findOne(+updateProductDto.colors);
-  //     product.colors=[];
-  //   }
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+    currentUser: UserEntity,
+  ): Promise<ProductEntity> {
+    const product = await this.productRepository.findOneBy({ id });
 
-  //   return await this.productRepository.save(product);
-  // }
+    if (!product)
+      throw new NotFoundException({
+        code: 'PRODUCT_NOT_FOUND',
+        message: 'Producto no encontrado',
+      });
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+    const { colorId, profileId } = updateProductDto;
+
+    if (colorId) {
+      const existingColor = await this.colorService.findOne(colorId);
+      product.color = existingColor;
+    }
+
+    if (profileId) {
+      const existingProfile = await this.profileService.findOne(profileId);
+      product.profile = existingProfile;
+    }
+
+    await this.productRepository.merge(product, updateProductDto);
+
+    return await this.saveProduct(product);
+  }
+
+  private async saveProduct(product: ProductEntity) {
+    try {
+      return await this.productRepository.save(product);
+    } catch (error) {
+      if ((error.code = 'ER_DUP_ENTRY')) {
+        throw new ConflictException({
+          code: 'PRODUCT_ALREADY_EXIST',
+          message:
+            'Ya existe un producto con esta combinación de color y perfil',
+        });
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async changeStatus(id: number, status: boolean) {
+    const product = await this.productRepository.findOneBy({ id });
+
+    if (!product)
+      throw new NotFoundException({
+        code: 'PRODUCT_NOT_FOUND',
+        message: 'Producto no encontrado',
+      });
+
+    if (status === product.status) throw new BadRequestException({code: 'PRODUCT_STATUS_NOT_CHANGED', message: 'El estatus del producto no ha cambiado'});
+
+    product.status = status;
+    
+    await this.saveProduct(product);
+  }
+
+  async remove(id: number) {
+    const product = await this.productRepository.findOneBy({ id });
+
+    if (!product) throw new NotFoundException({code: 'PRODUCT_NOT_FOUND', message: 'Producto no encontrado'});
+
+    try {
+      await this.productRepository.remove(product);
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
   }
 }
