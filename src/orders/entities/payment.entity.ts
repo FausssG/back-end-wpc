@@ -1,0 +1,35 @@
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { PaymentStatus } from "../enums/payment-status.enum";
+import { OrderEntity } from "./order.entity";
+
+@Entity({ name: 'payments' })
+export class PaymentEntity {
+      //* Establece el id como auto incremental
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  paymentType: string;
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  amount: number;
+
+  @Column()
+  currency: string;
+
+  @Column({
+    type: 'enum',
+    enum: PaymentStatus,
+    default: PaymentStatus.PENDING,
+  })
+  status: string;
+
+  @Column({default: null})
+  transactionId: string;
+
+  @CreateDateColumn()
+  paymentDate: Date;
+
+  @ManyToOne(() => OrderEntity, order => order.payments)
+  order: OrderEntity;
+}
