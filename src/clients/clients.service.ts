@@ -2,8 +2,6 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -11,36 +9,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ClientEntity } from './entities/client.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { clientsValidatorService } from './clients.validator.service';
 
 @Injectable()
 export class ClientsService {
   constructor(
     @InjectRepository(ClientEntity)
     private readonly clientRepository: Repository<ClientEntity>,
+    private clientsValidatorService: clientsValidatorService,
   ) {}
 
   async create(
     createClientDto: CreateClientDto,
     currentUser: UserEntity,
   ): Promise<ClientEntity> {
-    try {
-      const newClient = this.clientRepository.create(createClientDto);
+    const newClient = await this.clientRepository.create(createClientDto);
 
-      newClient.addedBy = currentUser;
+    newClient.addedBy = currentUser;
 
-      return await this.clientRepository.save(newClient);
-    } catch (error) {
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new ConflictException({
-          code: 'IDENTIFICATION_ALREADY_REGISTERED',
-          message: 'El número de identificación ya está registrado.',
-        });
-      }
-      throw new InternalServerErrorException({
-        code: 'DATABASE_ERROR',
-        message: 'Error interno al registrar el cliente.',
-      });
-    }
+    return await this.saveClient(newClient);
   }
 
   async update(
@@ -48,18 +35,20 @@ export class ClientsService {
     updateClientDto: UpdateClientDto,
     currentUser: UserEntity,
   ): Promise<ClientEntity> {
-    const client = await this.clientRepository.findOne({ where: { id } });
+    const client =
+      await this.clientsValidatorService.validateClientsExistsByIdAndRelations(
+        id
+      );
 
-    if (!client) {
-      throw new NotFoundException({
-        code: 'CLIENT_NOT_FOUND',
-        message: 'El cliente no existe',
-      });
-    }
+    await this.clientRepository.merge(client, updateClientDto);
 
+    client.modifiedBy = currentUser;
+
+    return await this.saveClient(client);
+  }
+
+  private async saveClient(client: ClientEntity) {
     try {
-      await this.clientRepository.merge(client, updateClientDto);
-      client.modifiedBy = currentUser;
       return await this.clientRepository.save(client);
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
@@ -82,35 +71,18 @@ export class ClientsService {
 
   // 🔹 Obtener un cliente por ID
   async findOne(id: number): Promise<ClientEntity> {
-    const client = await this.clientRepository.findOne({ where: { id } });
-
-    if (!client) {
-      throw new NotFoundException({
-        code: 'CLIENT_NOT_FOUND',
-        message: 'El cliente no existe',
-      });
-    }
-
-    return client;
+    return this.clientsValidatorService.validateClientsExistsByIdAndRelations(
+      id,
+    );
   }
 
   async remove(id: number) {
-    const client = await this.clientRepository.findOne({where: {id}, relations: ['orders']},);
-    
-    if (!client) {
-      throw new NotFoundException({
-        code: 'CLIENT_NOT_FOUND',
-        message: 'El cliente no existe',
-      });
-    }
+    await this.clientsValidatorService.validateClientHasNoOrders(id);
 
-    if (client.orders.length !== 0) throw new UnprocessableEntityException('No se puede eliminar el usuario, tiene ordenes a su nombre');
-    
     try {
       await this.clientRepository.delete(id);
     } catch (error) {
       throw new InternalServerErrorException();
     }
   }
-
 }
