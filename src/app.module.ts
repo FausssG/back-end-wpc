@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { dataSourceOptions } from '../db/data-source';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ColorsModule } from './color/colors.module';
+import { ColorsModule } from './colors/colors.module';
 import { OrdersModule } from './orders/orders.module';
 import { PlanningModule } from './planning/planning.module';
 import { BudgetsModule } from './budgets/budgets.module';
@@ -14,7 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { ClientsModule } from './clients/clients.module';
-import { ProfilesModule } from './profile/profiles.module';
+import { ProfilesModule } from './profiles/profiles.module';
 import { ProductsModule } from './products/products.module';
 
 

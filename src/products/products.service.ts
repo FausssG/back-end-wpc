@@ -11,8 +11,8 @@ import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
-import { ColorsService } from 'src/color/colors.service';
-import { ProfilesService } from '../profile/profiles.service';
+import { ColorsService } from 'src/colors/colors.service';
+import { ProfilesService } from '../profiles/profiles.service';
 import { UserEntity } from 'src/users/entities/user.entity';
 
 @Injectable()

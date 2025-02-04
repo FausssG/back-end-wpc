@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ColorsModule } from 'src/color/colors.module';
-import { ProfilesModule } from 'src/profile/profiles.module';
+import { ColorsModule } from 'src/colors/colors.module';
+import { ProfilesModule } from 'src/profiles/profiles.module';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
