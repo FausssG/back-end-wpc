@@ -1,45 +1,44 @@
-import { BudgetEntity } from "src/budgets/entities/budget.entity";
-import { ClientEntity } from "src/clients/entities/client.entity";
-import { PaymentEntity } from "src/payments/entities/payment.entity";
-import { UserEntity } from "src/users/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { ClientEntity } from 'src/clients/entities/client.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
+import {
+  AfterLoad,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { PaymentEntity } from './payment.entity';
+import { OrderLineEntity } from './order-line.entity';
+import { OrderStatus } from '../enums/order-status.enum';
 
-@Entity({name:'orders'})
+@Entity({ name: 'orders' })
 export class OrderEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id:number;
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PROCESSING })
+  status: string;
 
-    @Column()
-    state:string;
+  @CreateDateColumn()
+  orderAt: Date;
 
-    @Column()
-    orderDate:Date;
+  @Column({ default: true })
+  isQuote: boolean;
 
-    @Column()
-    createdBy:number;
+  @ManyToOne(() => UserEntity, (user) => user.orders)
+  addedBy: UserEntity;
 
-    @Column()
-    orderedBy:number;
+  @ManyToOne(() => ClientEntity, (client) => client.orders)
+  client: ClientEntity;
 
-    @Column()
-    estimatedDeliveryDate:Date;
+  @OneToMany(() => PaymentEntity, (payment) => payment.order, { cascade: true })
+  payments: PaymentEntity[];
 
-    @Column()
-    orderId:number;
-
-    @ManyToOne(()=> UserEntity, (user)=>user.orders)
-    addedBy:UserEntity;
-
-    @OneToMany(()=> PaymentEntity, (payment)=>payment.order)
-    payments:PaymentEntity[];
-
-    @ManyToOne(()=> ClientEntity, (client)=>client.orders)
-    client:ClientEntity;
-
-    @OneToOne(()=> BudgetEntity, (budget)=>budget.order)
-    @JoinColumn()
-    budget:BudgetEntity;
-
-
+  @OneToMany(() => OrderLineEntity, (orderProduct) => orderProduct.order, {
+    cascade: true,
+  })
+  orderLines: OrderLineEntity[];
+  
 }

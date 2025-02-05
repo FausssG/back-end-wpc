@@ -1,4 +1,4 @@
-import { OrderLineEntity } from "src/order-lines/entities/order-line.entity";
+
 import { UserEntity } from "src/users/entities/user.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -26,8 +26,8 @@ export class PlanningEntity {
     @ManyToOne(()=> UserEntity, (user)=>user.plannings)
     addedBy:UserEntity;
 
-    @OneToMany(()=> OrderLineEntity, (orderLine)=>orderLine.planning)
-    orderLines: OrderLineEntity[];
+    // @OneToMany(()=> OrderLineEntity, (orderLine)=>orderLine.planning)
+    // orderLines: OrderLineEntity[];
     
 
 }

@@ -1,8 +1,8 @@
 import {Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Timestamp, Unique, UpdateDateColumn} from "typeorm";
 import { ColorEntity } from "src/colors/entities/color.entity";
 import { UserEntity } from "src/users/entities/user.entity";
-import { OrderLineEntity } from "src/order-lines/entities/order-line.entity";
 import { ProfileEntity } from "src/profiles/entities/profile.entity";
+import { OrderLineEntity } from "src/orders/entities/order-line.entity";
 
 @Entity ({name:'products'})
 @Unique(['color', 'profile']) // 🚀 Evita combinaciones duplicadas

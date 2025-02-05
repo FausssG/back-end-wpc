@@ -39,4 +39,14 @@ export class ProductsController {
   async remove(@Param('id') id: string) {
     return this.productService.remove(+id);
   }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<ProductEntity> {
+    return this.productService.findOne(+id);
+  }
+
+  @Get()
+  async findAll() {
+    return this.productService.findAll();
+  }
 }

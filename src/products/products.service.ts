@@ -7,7 +7,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
@@ -102,17 +102,25 @@ export class ProductsService {
         message: 'Producto no encontrado',
       });
 
-    if (status === product.status) throw new BadRequestException({code: 'PRODUCT_STATUS_NOT_CHANGED', message: 'El estatus del producto no ha cambiado'});
+    if (status === product.status)
+      throw new BadRequestException({
+        code: 'PRODUCT_STATUS_NOT_CHANGED',
+        message: 'El estatus del producto no ha cambiado',
+      });
 
     product.status = status;
-    
+
     await this.saveProduct(product);
   }
 
   async remove(id: number) {
     const product = await this.productRepository.findOneBy({ id });
 
-    if (!product) throw new NotFoundException({code: 'PRODUCT_NOT_FOUND', message: 'Producto no encontrado'});
+    if (!product)
+      throw new NotFoundException({
+        code: 'PRODUCT_NOT_FOUND',
+        message: 'Producto no encontrado',
+      });
 
     try {
       await this.productRepository.remove(product);
@@ -121,4 +129,27 @@ export class ProductsService {
       throw new InternalServerErrorException();
     }
   }
+
+  async findOne(id: number) {
+    const product = await this.productRepository.findOneBy({ id });
+    if (!product) {
+      throw new NotFoundException({
+        code: 'PRODUCT_NOT_FOUND',
+        message: 'Producto no encontrado',
+      });
+    }
+    return product;
+  }
+
+  async findByIds(ids: number[]): Promise<ProductEntity[]> {
+    if (!ids.length) {
+      return [];
+    }
+    return await this.productRepository.findBy({ id: In(ids) });
+  }
+
+  findAll() {
+    return this.productRepository.find();
+  }
+  
 }

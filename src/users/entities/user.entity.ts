@@ -1,4 +1,3 @@
-import { BudgetEntity } from 'src/budgets/entities/budget.entity';
 import { ClientEntity } from 'src/clients/entities/client.entity';
 import { OrderEntity } from 'src/orders/entities/order.entity';
 import { PlanningEntity } from 'src/planning/entities/planning.entity';
@@ -49,9 +48,6 @@ export class UserEntity {
 
   @OneToMany(() => PlanningEntity, (planning) => planning.addedBy)
   plannings: PlanningEntity[];
-
-  @OneToMany(() => BudgetEntity, (budget) => budget.addedBy)
-  budgets: BudgetEntity[];
 
   @OneToMany(() => ProductEntity, (product) => product.addedBy)
   products: ProductEntity[];

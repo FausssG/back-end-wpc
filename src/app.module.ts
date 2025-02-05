@@ -4,10 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ColorsModule } from './colors/colors.module';
 import { OrdersModule } from './orders/orders.module';
 import { PlanningModule } from './planning/planning.module';
-import { BudgetsModule } from './budgets/budgets.module';
-import { PaymentsModule } from './payments/payments.module';
 import { CurrentUserMiddleware } from './utility/common/middlewares/current-user.middleware';
-import { OrderLinesModule } from './order-lines/order-lines.module';
 import { MailsModule } from './mails/mails.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
@@ -26,11 +23,8 @@ import { ProductsModule } from './products/products.module';
     }),
     ProductsModule,
     ColorsModule,
-    OrderLinesModule,
     OrdersModule,
     PlanningModule,
-    BudgetsModule,
-    PaymentsModule,
     MailsModule,
     AuthModule,
     UsersModule,

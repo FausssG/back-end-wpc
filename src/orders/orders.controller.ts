@@ -1,34 +1,52 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
+import { Auth } from 'src/utility/decorators/auth.decorator';
+import { Resource } from 'src/roles/enums/resource.enum';
+import { Action } from 'src/roles/enums/action.enum';
+import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { OrderEntity } from './entities/order.entity';
+import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  //! TODO cambiar Resource a Orders
+  @Auth([{ resource: Resource.users, actions: [Action.create] }])
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  async create(
+    @Body() createOrderDto: CreateOrderDto,
+    @CurrentUser() currentUser: UserEntity,
+  ): Promise<OrderEntity> {
+    return await this.ordersService.create(createOrderDto, currentUser);
   }
 
-  @Get()
-  findAll() {
-    return this.ordersService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
+  @Patch('payments/:id')
+  async setPayments(@Param('id') id: string, @Body() payments: CreatePaymentDto[]) {
+    return await this.ordersService.setPayments(+id, payments)
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
+  async update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
+    return await this.ordersService.update(+id, updateOrderDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return await this.ordersService.findOne(+id);
+  }
+
+  @Get()
+  async findAll() {
+    return await this.ordersService.findAll();
   }
 }
