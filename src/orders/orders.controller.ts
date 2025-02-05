@@ -1,34 +1,41 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
+import { Auth } from 'src/utility/decorators/auth.decorator';
+import { Resource } from 'src/roles/enums/resource.enum';
+import { Action } from 'src/roles/enums/action.enum';
+import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
-
+import { UserEntity } from 'src/users/entities/user.entity';
+import { OrderEntity } from './entities/order.entity';
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  //! TODO cambiar Resource a Orders
+  @Auth([{ resource: Resource.users, actions: [Action.create] }])
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.ordersService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
+  async create(
+    @Body() createOrderDto: CreateOrderDto,
+    @CurrentUser() currentUser: UserEntity,
+  ): Promise<OrderEntity> {
+    return await this.ordersService.create(createOrderDto, currentUser);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
+  async setPayments(@Param('id') id: string, @Body() payments: any) {
+    return await this.ordersService.setPayments(+id, payments)
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return await this.ordersService.findOne(+id);
   }
 }

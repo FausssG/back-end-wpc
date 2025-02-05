@@ -1,45 +1,70 @@
-import { BudgetEntity } from "src/budgets/entities/budget.entity";
-import { ClientEntity } from "src/clients/entities/client.entity";
-import { PaymentEntity } from "src/payments/entities/payment.entity";
-import { UserEntity } from "src/users/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { ClientEntity } from 'src/clients/entities/client.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
+import {
+  AfterLoad,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { PaymentEntity } from './payment.entity';
+import { OrderLineEntity } from './order-line.entity';
+import { OrderStatus } from '../enums/order-status.enum';
 
-@Entity({name:'orders'})
+@Entity({ name: 'orders' })
 export class OrderEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id:number;
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PROCESSING })
+  status: string;
 
-    @Column()
-    state:string;
+  @CreateDateColumn()
+  orderAt: Date;
 
-    @Column()
-    orderDate:Date;
+  @Column({ default: true })
+  isQuote: boolean;
 
-    @Column()
-    createdBy:number;
+  @Column({ type: 'timestamp', nullable: true })
+  quoteExpiresAt: Date | null;
 
-    @Column()
-    orderedBy:number;
+  @ManyToOne(() => UserEntity, (user) => user.orders)
+  addedBy: UserEntity;
 
-    @Column()
-    estimatedDeliveryDate:Date;
+  @ManyToOne(() => ClientEntity, (client) => client.orders)
+  client: ClientEntity;
 
-    @Column()
-    orderId:number;
+  @OneToMany(() => PaymentEntity, (payment) => payment.order, { cascade: true })
+  payments: PaymentEntity[];
 
-    @ManyToOne(()=> UserEntity, (user)=>user.orders)
-    addedBy:UserEntity;
+  @OneToMany(() => OrderLineEntity, (orderProduct) => orderProduct.order, {
+    cascade: true,
+  })
+  orderLines: OrderLineEntity[];
 
-    @OneToMany(()=> PaymentEntity, (payment)=>payment.order)
-    payments:PaymentEntity[];
-
-    @ManyToOne(()=> ClientEntity, (client)=>client.orders)
-    client:ClientEntity;
-
-    @OneToOne(()=> BudgetEntity, (budget)=>budget.order)
-    @JoinColumn()
-    budget:BudgetEntity;
-
-
+  @AfterLoad()
+  checkQuoteStatus() {
+    const now = new Date();
+    const totalAmount = this.orderLines.reduce((sum, line) => sum + (line.product_unit_price * line.product_quantity), 0);
+    const totalPaid = this.payments.reduce((sum, payment) => sum + payment.amount, 0);
+    const fifteenDaysLater = new Date(this.orderAt);
+    fifteenDaysLater.setDate(fifteenDaysLater.getDate() + 15);
+  
+    if (totalPaid >= totalAmount * 0.5) {
+      // Se convierte en pedido confirmado y entra en producción
+      this.isQuote = false;
+      this.status = OrderStatus.CONFIRMED;
+    } else if (totalPaid > 0) {
+      // Precio congelado porque se realizó un pago parcial
+      this.isQuote = true;
+      this.status = OrderStatus.FROZEN;
+    } else if (now > fifteenDaysLater) {
+      // No se pagó nada en 15 días, el presupuesto expira
+      this.isQuote = true;
+      this.status = OrderStatus.EXPIRED;
+    }
+  }
+  
 }

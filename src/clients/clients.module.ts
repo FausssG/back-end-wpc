@@ -9,5 +9,6 @@ import { clientsValidatorService } from './clients.validator.service';
   imports: [TypeOrmModule.forFeature([ClientEntity])],
   controllers: [ClientsController],
   providers: [ClientsService, clientsValidatorService],
+  exports: [ClientsService]
 })
 export class ClientsModule {}
