@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { PaymentStatus } from "../enums/payment-status.enum";
 import { OrderEntity } from "./order.entity";
+import { Exclude } from "class-transformer";
+import { PaymentType } from "../enums/payment-types.enum";
 
 @Entity({ name: 'payments' })
 export class PaymentEntity {
@@ -8,21 +9,14 @@ export class PaymentEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  paymentType: string;
+  @Column({type: 'enum', enum: PaymentType})
+  paymentType: PaymentType;
 
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
 
   @Column()
   currency: string;
-
-  @Column({
-    type: 'enum',
-    enum: PaymentStatus,
-    default: PaymentStatus.PENDING,
-  })
-  status: string;
 
   @Column({default: null})
   transactionId: string;
@@ -31,5 +25,6 @@ export class PaymentEntity {
   paymentDate: Date;
 
   @ManyToOne(() => OrderEntity, order => order.payments)
+  @Exclude()  // Evita que la propiedad 'order' se serialice
   order: OrderEntity;
 }

@@ -1,7 +1,16 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateOrderDto } from './create-order.dto';
+import { ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import { OrderLineDto } from './order-lines.dto';
+import { CreatePaymentDto } from './create-payment.dto';
 
-export class UpdatePedidoDto extends PartialType(CreateOrderDto) {
+export class UpdateOrderDto {
 
+  @Type(() => OrderLineDto)
+  @ValidateNested()
+  orderLines: OrderLineDto[];
+
+  @Type(() => CreatePaymentDto)
+  @ValidateNested()
+  payments: CreatePaymentDto[];
 
 }

@@ -147,5 +147,9 @@ export class ProductsService {
     }
     return await this.productRepository.findBy({ id: In(ids) });
   }
+
+  findAll() {
+    return this.productRepository.find();
+  }
   
 }
