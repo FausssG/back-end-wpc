@@ -12,5 +12,6 @@ import { ProductsModule } from 'src/products/products.module';
   imports: [TypeOrmModule.forFeature([OrderEntity, OrderLineEntity, PaymentEntity]), ClientsModule, ProductsModule],
   controllers: [OrdersController],
   providers: [OrdersService],
+  exports: [TypeOrmModule.forFeature([OrderLineEntity])]
 })
 export class OrdersModule {}

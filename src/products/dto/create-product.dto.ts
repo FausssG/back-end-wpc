@@ -1,5 +1,5 @@
 // create-product.dto.ts
-import { IsNumber, IsString, IsNotEmpty, IsBoolean } from 'class-validator';
+import { IsNumber, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateProductDto {

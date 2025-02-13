@@ -75,6 +75,9 @@ export class AuthController {
   @UseGuards(AuthenticationGuard)
   @Get('profile')
   async profile(@CurrentUser() user: UserEntity): Promise<Partial<UserEntity>> {
+
+    console.log(user);
+    
     const { password, active, activationToken, resetPasswordToken, ...rest } =
       user;
     return rest;

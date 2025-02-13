@@ -1,6 +1,8 @@
 
+import { OrderLineEntity } from "src/orders/entities/order-line.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { PlanningStatus } from "../enums/planning-status.enum";
 
 @Entity({name: 'planning'})
 export class PlanningEntity {
@@ -8,8 +10,8 @@ export class PlanningEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    status:string;
+    @Column({ type: 'enum', enum: PlanningStatus, default: PlanningStatus.DRAFT })
+    status: PlanningStatus;
 
     @Column()
     createdDate: Date;
@@ -20,14 +22,10 @@ export class PlanningEntity {
     @Column()
     dateUntil: Date;
 
-    @Column()
-    createdBy: number;
-
     @ManyToOne(()=> UserEntity, (user)=>user.plannings)
     addedBy:UserEntity;
 
-    // @OneToMany(()=> OrderLineEntity, (orderLine)=>orderLine.planning)
-    // orderLines: OrderLineEntity[];
-    
+    @OneToMany(() => OrderLineEntity, orderLine => orderLine.planning, { cascade: true })
+    orderLines: OrderLineEntity[];
 
 }

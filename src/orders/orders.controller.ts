@@ -16,6 +16,7 @@ import { UserEntity } from 'src/users/entities/user.entity';
 import { OrderEntity } from './entities/order.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { OrderStatus } from './enums/order-status.enum';
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
@@ -48,5 +49,10 @@ export class OrdersController {
   @Get()
   async findAll() {
     return await this.ordersService.findAll();
+  }
+
+  @Get()
+  async getOrdersByStatus(@Param('status') status: OrderStatus) {
+    return await this.ordersService.getOrdersByStatus(status);
   }
 }

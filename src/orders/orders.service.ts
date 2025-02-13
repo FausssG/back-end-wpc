@@ -108,7 +108,7 @@ export class OrdersService {
     return order.payments.reduce((sum, payment) => sum + Number(payment.amount), 0);
   }
 
-  private checkQuoteStatus(order: OrderEntity) {
+  private async checkQuoteStatus(order: OrderEntity) {
     if (!order.isQuote) return;
 
     const now = new Date();
@@ -125,6 +125,8 @@ export class OrdersService {
     } else if (now > fifteenDaysLater) {
       order.status = OrderStatus.EXPIRED;
     }
+
+    await this.orderRepository.save(order);
   }
 
   async setPayments(orderId: number, paymentDtos: CreatePaymentDto[]) {
@@ -235,6 +237,11 @@ export class OrdersService {
     return updatedLines;
   }
   
-  
+  async getOrdersByStatus(status: OrderStatus) {
+    return await this.orderRepository.find({
+      where: { status },
+      relations: ['orderLines', 'client', 'payments'],
+    });
+  }
 
 }

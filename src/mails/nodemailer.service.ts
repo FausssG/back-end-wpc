@@ -1,7 +1,6 @@
 import { ConflictException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { IMailService } from './interfaces/mails.interface';
-import { Console } from 'console';
 
 @Injectable()
 export class NodemailerService implements IMailService {

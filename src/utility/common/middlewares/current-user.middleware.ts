@@ -29,8 +29,10 @@ export class CurrentUserMiddleware implements NestMiddleware {
     const token = authHeader.split(' ')[1];
   
     try {
-      const { id } = <JwtPayload>verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
-      const currentUser = await this.validatorService.validateUserExistsById(id);
+      const { payload } = <JwtPayload>verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
+      
+      const currentUser = await this.validatorService.validateUserExistsById(payload.id);
+
       req.currentUser = currentUser;
       next();
     } catch (error) {
@@ -41,6 +43,13 @@ export class CurrentUserMiddleware implements NestMiddleware {
 }
 
 interface JwtPayload {
-  id: string;
+  payload: {
+    id: string,
+    email: string,
+    roleId: number,
+    active: boolean
+  },
+  iat: number,
+  exp: number
 }
 
