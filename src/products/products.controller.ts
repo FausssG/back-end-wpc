@@ -14,7 +14,7 @@ import { Action } from 'src/roles/enums/action.enum';
 export class ProductsController {
   constructor(private readonly productService: ProductsService) {}
 
-  @Auth([{resource: Resource.users, actions: [Action.create]}])
+  @Auth([{resource: Resource.products, actions: [Action.create]}])
   @Post()
   async create(@Body() createProductDto: CreateProductDto, @CurrentUser() currentUser: UserEntity ): Promise<ProductEntity> {
     return this.productService.create(createProductDto, currentUser);
