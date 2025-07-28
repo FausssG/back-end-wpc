@@ -5,6 +5,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -27,10 +28,14 @@ export class OrderEntity {
   @Column({ default: true })
   isQuote: boolean;
 
-  @ManyToOne(() => UserEntity, (user) => user.orders)
+  // Configuración correcta para addedBy (usuario que creó el pedido)
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'addedById' }) // Nombre exacto de la columna en la BD
   addedBy: UserEntity;
 
-  @ManyToOne(() => ClientEntity, (client) => client.orders)
+  // Configuración correcta para client (cliente asociado)
+  @ManyToOne(() => ClientEntity)
+  @JoinColumn({ name: 'clientId' }) // Nombre exacto de la columna en la BD
   client: ClientEntity;
 
   @OneToMany(() => PaymentEntity, (payment) => payment.order, { cascade: true })

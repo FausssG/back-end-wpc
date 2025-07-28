@@ -1,4 +1,4 @@
-import { ClientEntity } from 'src/clients/entities/client.entity';
+  import { ClientEntity } from 'src/clients/entities/client.entity';
 import { OrderEntity } from 'src/orders/entities/order.entity';
 import { PlanningEntity } from 'src/planning/entities/planning.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
@@ -57,4 +57,5 @@ export class UserEntity {
 
   @ManyToOne(() => RoleEntity, (role) => role.users)
   role: RoleEntity;
+
 }

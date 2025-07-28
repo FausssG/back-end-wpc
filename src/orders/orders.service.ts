@@ -76,17 +76,51 @@ export class OrdersService {
     return this.orderRepository.find();
   }
 
-  async findOne(id: number) {
+async findOne(id: number): Promise<OrderEntity> {
     const order = await this.orderRepository.findOne({
       where: { id },
-      relations: ['client', 'addedBy', 'orderLines', 'payments'],
+      relations: {
+        client: true,
+        addedBy: true,
+        orderLines: {
+          product: true // Asegúrate de cargar la relación del producto
+        },
+        payments: true
+      },
       select: {
-        addedBy: {
-          email: true,
+        id: true,
+        status: true,
+        orderAt: true,
+        isQuote: true,
+        client: {
+          id: true,
           firstName: true,
           lastName: true,
+          email: true
         },
-      },
+        addedBy: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true
+        },
+        orderLines: {
+          id: true,
+          product_quantity: true,
+          product_unit_price: true,
+          product: {
+            id: true,
+            name: true,
+            price: true
+          }
+        },
+        payments: {
+          id: true,
+          amount: true,
+          paymentType: true,
+          paymentDate: true
+        }
+      }
     });
 
     if (!order) {
@@ -98,7 +132,7 @@ export class OrdersService {
 
     this.checkQuoteStatus(order);
     return order;
-  }
+}
 
   private getTotalPrice(order: OrderEntity): number {
     return order.orderLines.reduce((sum, line) => sum + (line.product_unit_price * line.product_quantity), 0);

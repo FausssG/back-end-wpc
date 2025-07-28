@@ -12,7 +12,12 @@ export class CreateClientDto {
   @IsString()
   @IsNotEmpty()
   @Length(2, 255)
-  name: string;
+  firstName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Length(2, 255)
+  lastName: string;
 
   @IsEnum(IdentificationTypeEnum)
   @IsNotEmpty()
@@ -32,11 +37,6 @@ export class CreateClientDto {
   @IsOptional()
   @Length(0, 255)
   address_street?: string;
-
-  @IsString()
-  @IsOptional()
-  @Length(0, 255)
-  address_street_2?: string;
 
   @IsString()
   @IsOptional()

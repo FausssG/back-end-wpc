@@ -40,7 +40,7 @@ import { ConfigService } from '@nestjs/config';
     },
     {
       provide: 'FRONTEND_BASE_URL',
-      useValue: process.env.FRONTEND_BASE_URL || 'http://localhost:3000'
+      useValue: process.env.FRONTEND_BASE_URL || 'http://localhost:4200'
     }
   ],
   exports: ['IMailService'],

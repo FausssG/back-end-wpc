@@ -15,13 +15,16 @@ export class ClientEntity {
     type: ClientType;
 
     @Column({ length: 255 })
-    name: string;
+    firstName: string;
+
+    @Column({ length: 255 })
+    lastName: string;
 
     @Column({ length: 255, nullable: true })
     address_street: string;
 
-    @Column({ length: 255, nullable: true })
-    address_street_2: string;
+    // @Column({ length: 255, nullable: true })
+    // address_street_2: string;
 
     @Column({ length: 100, nullable: true })
     city: string;
@@ -57,11 +60,11 @@ export class ClientEntity {
     @Index()  // Índice para mejorar las búsquedas
     email: string;
 
-    @ManyToOne(()=> UserEntity, (user)=>user.clients)
+    @ManyToOne(() => UserEntity, (user) => user.clients, { nullable: false })
     modifiedBy: UserEntity;
 
-    @ManyToOne(()=> UserEntity, (user)=>user.clients)
-    addedBy:UserEntity;
+    @ManyToOne(() => UserEntity, (user) => user.clients, { nullable: false })
+    addedBy: UserEntity;
 
     @OneToMany(()=> OrderEntity, (order)=>order.client)
     orders: OrderEntity[];

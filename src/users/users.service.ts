@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,6 +10,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { ValidatorService } from 'src/auth/validator.service';
 import { RemoveUserDto } from './dto/remove-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { RegisterDto } from './dto/register.dto';
+import * as bcryptjs from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -70,6 +74,30 @@ export class UsersService {
     );
 
     await this.userRepository.delete(userId);
+  }
+
+  async createUser(createUserDto: CreateUserDto | RegisterDto): Promise<UserEntity> {
+    try {
+      //ENCRIPTAR CONTRASEÑA
+      createUserDto.password = await bcryptjs.hashSync(
+        createUserDto.password,
+        10,
+      );
+      //creacion de usuario en memoria
+      let user = await this.userRepository.create(createUserDto);
+      //guardado de usuario en la base de datos
+      user = await this.userRepository.save(user);
+      //eliminacion de la contraseña para no devolverla
+      delete user.password;
+      //devolucion del usuario
+      return user;
+    } catch (error) {
+      if (error.errno === 1062) {
+        throw new BadRequestException(`${createUserDto.email} alredy exists!`);
+      }
+
+      throw new InternalServerErrorException('Something terrible happen!');
+    }
   }
 
   async findAll() {

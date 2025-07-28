@@ -11,8 +11,12 @@ export class ProductEntity {
     @PrimaryGeneratedColumn()
     id:number;
 
+    @Column()
+    name: string;
+
     @Column('float')
     price: number;
+
     
     @Column({ default: true })
     status: boolean;

@@ -25,7 +25,7 @@ export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   //!TODO EL RESOURCE DEBE SER CLIENTS
-  @Auth([{ resource: Resource.users, actions: [Action.create] }])
+  // @Auth([{ resource: Resource.users, actions: [Action.create] }])
   @Post()
   async create(
     @Body() CreateClientDto: CreateClientDto,
@@ -45,7 +45,7 @@ export class ClientsController {
   }
 
   //!TODO EL RESOURCE DEBE SER CLIENTS
-  @Auth([{ resource: Resource.users, actions: [Action.update] }])
+  // @Auth([{ resource: Resource.users, actions: [Action.update] }])
   @Patch(':id')
   async updateClient(
     @Param('id') id: string,
@@ -68,7 +68,7 @@ export class ClientsController {
   }
 
   //!TODO EL RESOURCE DEBE SER CLIENTS
-  @Auth([{ resource: Resource.users, actions: [Action.delete] }])
+  // @Auth([{ resource: Resource.users, actions: [Action.delete] }])
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.clientsService.remove(+id);

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RemoveUserDto } from './dto/remove-user.dto';
@@ -8,6 +8,7 @@ import { Auth } from 'src/utility/decorators/auth.decorator';
 import { Resource } from 'src/roles/enums/resource.enum';
 import { Action } from 'src/roles/enums/action.enum';
 import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -16,6 +17,11 @@ export class UsersController {
   @Get()
   async findAll() {
     return this.usersService.findAll();
+  }
+
+  @Post()
+  async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
+    return await this.usersService.createUser(createUserDto);
   }
 
   @Get(':id')
